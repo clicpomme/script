@@ -2,7 +2,7 @@
  
 # Richard Charbonneau
 # http://www.clicpomme.com
-# Updated 06/05/2015
+# Updated 22/04/2015
  
 # Set New computerNAME manually
 # Workstations (iMac) - LVL-WKS-XXXX <- Last 3 characters of SN 
@@ -12,7 +12,7 @@
 
 #Set new computer name bas on 4 last digit serial
 serial=`/usr/sbin/system_profiler SPHardwareDataType | /usr/bin/awk '/Serial\ Number\ \(system\)/ {print substr($0,length-3)}'`
-
+#tld="***.com"
 
 echo Hi, which user accont are you migrating ?
 read varusr
@@ -44,11 +44,13 @@ echo this Mac is rename to $base"-"$vardsklpt"-"$serial
 #/usr/sbin/scutil --set HostName $$base"-"$vardsklpt"-"$serial.tld
 
 # These variables need to be configured for your env
-odAdmin="*****" #enter your OD admin name between the quotes
-odPassword="*****"  # Enter your OD admin password between the quotes
-domain="server.domain.com" # FQDN of your OD domain
-oldDomain="server.domain.com" # If moving from another OD, enter that FQDN here
-oldODip="192.168.0.1" # Enter the IP of your old OD
+odAdmin="diradmin" #enter your OD admin name between the quotes
+odPassword="cep2012"  # Enter your OD admin password between the quotes
+domain="vmosxserver-od-test.lan" # FQDN of your OD domain
+oldDomain="serveurcep.expcep.lan" # If moving from another OD, enter that FQDN here
+oldODip="192.168.0.222" # Enter the IP of your old OD
+#ADdomain="ad.compagny.com" # Enter your AD domain here
+#computerGroup=computers  # Add appropriate computer group you want machines to be added to, case sensitive 
  
 # These variables probably don't need to be changed
 
@@ -93,27 +95,82 @@ else
 	dscl /Search -create / SearchPolicy CSPSearchPath
 	sleep 10
 	dscl /Search -append / CSPSearchPath /LDAPv3/$domain
-	echo "Killing DirectoryService"
-#	killall DirectoryService
+	echo "Restart DirectoryService"
+	killall opendirectoryd
+	sleep 30
 	fi
 fi
 fi
+#if [ "${check4ODacct}" == "${computerName}" ]; then
+#	echo "This machine has a computer account on ${domain} already."
+#else
+#	echo "Adding computer account to ${domain}"
+#	dscl -u "${odAdmin}" -P "${odPassword}" /LDAPv3/${domain} -create /Computers/${computerName} ENetAddress "$nicAddress"
+#	dscl -u "${odAdmin}" -P "${odPassword}" /LDAPv3/${domain} -merge /Computers/${computerName} RealName ${computerName}
+#	# Add computer to ComputerList
+#	dscl -u "${odAdmin}" -P "${odPassword}" /LDAPv3/${domain} -merge /ComputerLists/${computerGroup} apple-computers ${computerName}		
+#
+#	# Set the GUID
+#	GUID="$(dscl /LDAPv3/${domain} -read /Computers/${computerName} GeneratedUID | awk '{ print $2 }')"
+#	# Add to computergroup
+#	dscl -u "${odAdmin}" -P "${odPassword}" /LDAPv3/${domain} -merge /ComputerGroups/${computerGroup} apple-group-memberguid "${GUID}"
+#	dscl -u "${odAdmin}" -P "${odPassword}" /LDAPv3/${domain} -merge /ComputerGroups/${computerGroup} memberUid ${computerName}
+#fi
  
 sleep 25 # Give DS a chance to catch up
  
+# Fix DS search order
+
+# echo "Checking DS search order..."
+#if [ "${check4AD}" == "${adDomain}" ]; then
+#	dsconfigad -alldomains enable
+#	dscl /Search -delete / CSPSearchPath "/Active Directory/${adDomain}"
+#	dscl /Search/Contacts -delete / CSPSearchPath "/Active Directory/${adDomain}"
+#	dscl /Search -append / CSPSearchPath "/Active Directory/All Domains"
+#	if [ $osvers -eq 6 ]; then
+#		echo "OS detected as ${osversionlong}"
+#		echo "Setting AD, then OD to search order..."
+#		dscl localhost changei /Search CSPSearchPath 2 "/Active Directory/All Domains"
+#		dscl localhost changei /Search CSPSearchPath 3 /LDAPv3/$domain
+#		dscl /Search/Contacts -append / CSPSearchPath "/Active Directory/All Domains"
+#	else if [[ ${osvers} -eq 7 || 8 || 9 || 10 ]]; then
+#		echo "OS detected as ${osversionlong}"
+#		echo "Setting OD, then AD to search order..."
+#		dscl localhost changei /Search CSPSearchPath 3 "/Active Directory/All Domains"
+#		dscl localhost changei /Search CSPSearchPath 2 /LDAPv3/$domain
+#		dscl /Search/Contacts -append / CSPSearchPath "/Active Directory/All Domains"
+#	fi
+#fi
+#	else if [ "${check4AD}" == "All Domains" ]; then
+#	dscl /Search -append / CSPSearchPath "/Active Directory/All Domains"
+#	sleep 15
+#		if [ $osvers -eq 6 ]; then
+#			echo "OS detected as ${osversionlong}"
+#			echo "Setting AD, then OD to search order..."
+#			dscl localhost changei /Search CSPSearchPath 1 "/Active Directory/All Domains"
+#			dscl localhost changei /Search CSPSearchPath 2 /LDAPv3/$domain
+#		else if [[ ${osvers} -eq 7 || 8 || 9 || 10 ]]; then
+#			echo "OS detected as ${osversionlong}"
+#			echo "Setting OD, then AD to search order..."
+#			dscl localhost changei /Search CSPSearchPath 2 /LDAPv3/$domain
+#			dscl localhost changei /Search CSPSearchPath 3 "/Active Directory/All Domains"
+#			dscl /Search/Contacts -append / CSPSearchPath "/Active Directory/All Domains"
+#		fi
+#	fi
+#fi
+#fi
 
 # 	Apply userpermission on local Home folder for new OD domaine
 echo réparation des permissions du répertoire utilisateur #varusr
 chown -R $varusr:staff /Users/$varusr
 
 # Repair diskpermission
-echo "repair OSX disk Permission"
+echo "OSX DISK PERMISSION REPAIR"
 diskutil repairPermissions /
 
 # reboot 
-echo "reboot in 20 sec"
+echo "System will reboot in 20 sec ...."
 sleep 20
 shutdown -r now
-
-echo "done ... now rebooting"
+echo "done ... rebooting now."
 exit 0
