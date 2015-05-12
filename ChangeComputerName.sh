@@ -45,9 +45,9 @@ echo this Mac is rename to $base"-"$vardsklpt"-"$serial
 
 # These variables need to be configured for your env
 odAdmin="diradmin" #enter your OD admin name between the quotes
-odPassword="cep2012"  # Enter your OD admin password between the quotes
-domain="vmosxserver-od-test.lan" # FQDN of your OD domain
-oldDomain="serveurcep.expcep.lan" # If moving from another OD, enter that FQDN here
+odPassword="password"  # Enter your OD admin password between the quotes
+domain="vmosxserver.domain.lan" # FQDN of your OD domain
+oldDomain="server.doamin.lan" # If moving from another OD, enter that FQDN here
 oldODip="192.168.0.222" # Enter the IP of your old OD
 #ADdomain="ad.compagny.com" # Enter your AD domain here
 #computerGroup=computers  # Add appropriate computer group you want machines to be added to, case sensitive 
