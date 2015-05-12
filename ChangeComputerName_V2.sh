@@ -1,9 +1,5 @@
 #!/bin/sh
  
-# Richard Charbonneau
-# http://www.clicpomme.com
-# Updated 22/04/2015
- 
 # Set New computerNAME manually
 # Workstations (iMac) - LVL-WKS-XXXX <- Last 3 characters of SN 
 # Servers - LVL-SRV-XXX <- Incremental Number 001 and up
