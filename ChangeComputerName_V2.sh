@@ -2,7 +2,7 @@
  
 # Richard Charbonneau
 # http://www.clicpomme.com
-# Updated 22/04/2015
+# Updated 15/05/2015
  
 # Set New computerNAME manually
 # Workstations (iMac) - LVL-WKS-XXXX <- Last 3 characters of SN 
@@ -44,11 +44,11 @@ echo this Mac is rename to $base"-"$vardsklpt"-"$serial
 #/usr/sbin/scutil --set HostName $$base"-"$vardsklpt"-"$serial.tld
 
 # These variables need to be configured for your env
-odAdmin="diradmin" #enter your OD admin name between the quotes
+odAdmin="admin" #enter your OD admin name between the quotes
 odPassword="password"  # Enter your OD admin password between the quotes
-domain="vmosxserver.domain.lan" # FQDN of your OD domain
-oldDomain="server.doamin.lan" # If moving from another OD, enter that FQDN here
-oldODip="192.168.0.222" # Enter the IP of your old OD
+domain="server.domain.com" # FQDN of your OD domain
+oldDomain="server.domain.com" # If moving from another OD, enter that FQDN here
+oldODip="XXX.XXX.XXX.XXX" # Enter the IP of your old OD
 #ADdomain="ad.compagny.com" # Enter your AD domain here
 #computerGroup=computers  # Add appropriate computer group you want machines to be added to, case sensitive 
  
@@ -61,6 +61,7 @@ check4ODacct=`dscl /LDAPv3/${domain} -read Computers/${computerName} RealName | 
 #check4AD=`dscl localhost -list /Active\ Directory`
 osversionlong=`sw_vers -productVersion`
 osvers=$(sw_vers -productVersion | awk -F. '{print $2}')
+mobileuser=`dscl . -list /Users AuthenticationAuthority | grep LocalCachedUser | awk '{print $1}'`
  
 # Check if on OD already
 if [ "${check4OD}" == "${domain}" ]; then
@@ -69,7 +70,7 @@ if [ "${check4OD}" == "${domain}" ]; then
 	if [ "${odSearchPath}" = "" ]; then
 		echo "$domain not found in search path. Adding..."
 		dscl /Search -append / CSPSearchPath /LDAPv3/$domain
-		sleep 10
+		sleep 30
 	fi
 else if [ "${check4OD}" == "${oldDomain}" ]; then
 	echo "Removing from ${oldDomain}"
@@ -79,7 +80,9 @@ else if [ "${check4OD}" == "${oldDomain}" ]; then
 	echo "Binding to $domain"
 	dsconfigldap -v -a $domain -n $domain
 	dscl /Search -create / SearchPolicy CSPSearchPath
-	killall DirectoryService
+	echo "Restart DirectoryService"
+	killall opendirectoryd
+	sleep 30
 else if [ "${check4OD}" == "${oldODip}" ]; then
 	echo "Removing from ${oldODip}"
 		dsconfigldap -r "${oldODip}"
@@ -88,7 +91,9 @@ else if [ "${check4OD}" == "${oldODip}" ]; then
 		echo "Binding to $domain"
 		dsconfigldap -v -a $domain -n $domain
 		dscl /Search -create / SearchPolicy CSPSearchPath
-		killall DirectoryService
+		echo "Restart DirectoryService"
+		killall opendirectoryd
+	sleep 30
 else
 	echo "No previous OD servers found, binding to $domain"
 	dsconfigldap -v -a $domain -n $domain
@@ -160,13 +165,34 @@ sleep 25 # Give DS a chance to catch up
 #fi
 #fi
 
-# 	Apply userpermission on local Home folder for new OD domaine
-echo réparation des permissions du répertoire utilisateur #varusr
-chown -R $varusr:staff /Users/$varusr
-
+# 	DELETE USER mobile Account Localcache  not removing userhomefolder
+echo "Deleting Users for $varusr but keeping user home folder"
+if [ "${mobileuser}" == "${varusr}" ]; then
+	echo "User account $varusr is a mobile account."
+	dscl . -remove /Users/"${varusr}"
+	if [ "${odSearchPath}" != "${varusr}" ]; then
+		echo "$varusr not found in mobile account ... will be ignore"
+		sleep 30
+	fi
+else if [ "${check4OD}" == "${oldDomain}" ]; then
+	echo "Removing from ${oldDomain}"
+	dsconfigldap -r "${oldDomain}"
+	dscl /Search -delete / CSPSearchPath /LDAPv3/"${oldDomain}"
+	dscl /Search/Contacts -delete / CSPSearchPath /LDAPv3/"${oldDomain}"
+	echo "Binding to $domain"
+	dsconfigldap -v -a $domain -n $domain
+	dscl /Search -create / SearchPolicy CSPSearchPath
+	echo "Restart DirectoryService"
+	killall opendirectoryd
+	sleep 30
+	
 # Repair diskpermission
 echo "OSX DISK PERMISSION REPAIR"
 diskutil repairPermissions /
+
+# 	Apply userpermission on local Home folder for new OD domaine
+echo "REPAIR USER HOMEFOLDER PERMISSION FOR $varusr"
+chown -R $varusr:staff /Users/$varusr
 
 # reboot 
 echo "System will reboot in 20 sec ...."
