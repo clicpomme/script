@@ -17,7 +17,7 @@ if [ "${model}" == "${mb}" ]; then
 	vardsklpt="ML"
 else
 	vardsklpt="M"
-	exit $exit_status
+# exit $exit_status
 fi
 
 /usr/sbin/scutil --set ComputerName $base"-"$vardsklpt"-"$serial
