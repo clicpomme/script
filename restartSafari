@@ -1,0 +1,7 @@
+#!/bin/sh
+ 
+# (c) 2016 Richard Charbonneau Clicpomme
+ 
+# Script to quit Safari after Flash Update
+ 
+killall Safari
