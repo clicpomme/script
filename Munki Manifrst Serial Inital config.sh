@@ -2,10 +2,9 @@
  
 # Richard Charbonneau
 # http://www.clicpomme.com
-# Updated 18/11/2015
+# Updated 9/11/2016
 
-
-#Grab Serial to Manifest Munki
-serial=`/usr/sbin/system_profiler SPHardwareDataType | /usr/bin/awk '/Serial\ Number\ \(system\)/ {print substr($0,length-11)}'`
-
+#Grab Serial to Manifest Munki client
+serial=$(ioreg -c IOPlatformExpertDevice -d 2 | awk -F\" '/IOPlatformSerialNumber/{print $(NF-1)}')
 sudo defaults write /Library/Preferences/ManagedInstalls ClientIdentifier $serial
+exit 0
