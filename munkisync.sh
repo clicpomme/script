@@ -15,16 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-MUNKI_USER_SOURCE=munkiadmin
-MUNKI_REPO_SOURCE=~/
-MUNKI_HOST_SOURCE=munki.EXAMPLE.COM
-MUNKI_REPO_TARGET=~/
+MUNKI_USER_TARGET=munkiadmin
+MUNKI_REPO_TARGET=~/var/www/munki_repo
+MUNKI_HOST_TARGET=munki.EXAMPLE.COM
+MUNKI_REPO_SOURCE=/Users/Share/munki_repo
 RSYNC_EXCLUDE="\
 	--exclude=.** \
-	--exclude=pkgs/local/ \
-	--exclude=pkgsinfo/local/ \
-	--exclude=manifests/ \
-	--exclude=catalogs/ \
+#	--exclude=pkgs/local/ \
+#	--exclude=pkgsinfo/local/ \
+#	--exclude=manifests/ \
+#	--exclude=catalogs/ \
+	--exclude=munkireport-php/ \
 	--exclude=log/ \
 	--exclude=dev/ \
 	--exclude=tmp/ \
@@ -38,6 +39,6 @@ if [[ ! -d ~/log ]]; then
 fi
 
 echo "munkisync started: $(date)" > ~/log/munkisync.log 2>&1
-/usr/bin/rsync $RSYNC_OPTIONS $MUNKI_USER_SOURCE@$MUNKI_HOST_SOURCE:$MUNKI_REPO_SOURCE $MUNKI_REPO_TARGET >> ~/log/munkisync.log 2>&1
+/usr/bin/rsync $RSYNC_OPTIONS $MUNKI_REPO_SOURCE $MUNKI_USER_TARGET@$MUNKI_HOST_TARGET:$MUNKI_REPO_TARGET >> ~/log/munkisync.log 2>&1
 $HOME/bin/makecatalogs ~ >> ~/log/munkisync.log 2>&1
 echo "munkisync ended: $(date)" >> ~/log/munkisync.log 2>&1
