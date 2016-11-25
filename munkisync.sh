@@ -16,9 +16,9 @@
 # limitations under the License.
 
 MUNKI_USER_TARGET=munkiadmin
-MUNKI_REPO_TARGET=~/var/www/munki_repo
+MUNKI_REPO_TARGET=/var/www/munki_repo
 MUNKI_HOST_TARGET=munki.EXAMPLE.COM
-MUNKI_REPO_SOURCE=/Users/Share/munki_repo
+MUNKI_REPO_SOURCE=/Users/Shared/munki_repo/
 RSYNC_EXCLUDE="\
 	--exclude=.** \
 	--exclude=munkireport-php/ \
