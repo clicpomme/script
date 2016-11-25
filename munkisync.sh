@@ -21,15 +21,15 @@ MUNKI_HOST_TARGET=munki.EXAMPLE.COM
 MUNKI_REPO_SOURCE=/Users/Share/munki_repo
 RSYNC_EXCLUDE="\
 	--exclude=.** \
+	--exclude=munkireport-php/ \
+	"
+#	--exclude=log/ \
+#	--exclude=dev/ \
+#	--exclude=tmp/ \
 #	--exclude=pkgs/local/ \
 #	--exclude=pkgsinfo/local/ \
 #	--exclude=manifests/ \
 #	--exclude=catalogs/ \
-	--exclude=munkireport-php/ \
-	--exclude=log/ \
-	--exclude=dev/ \
-	--exclude=tmp/ \
-	"
 
 RSYNC_OPTIONS="-aHSpv --delete-during  $RSYNC_EXCLUDE $RSYNC_INCLUDE $@"
 #RSYNC_OPTIONS="-aHSpv --delete-during --bwlimit=64 $RSYNC_EXCLUDE $RSYNC_INCLUDE $@"
