@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+chmod -R a+rX /Users/Shares/munki_repo
+
 MUNKI_USER_TARGET=munkiadmin
 MUNKI_REPO_TARGET=/var/www/munki_repo
 MUNKI_HOST_TARGET=munki.EXAMPLE.COM
