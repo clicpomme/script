@@ -18,7 +18,7 @@
 chmod -R a+rX /Users/Shares/munki_repo
 
 MUNKI_USER_TARGET=munkiadmin
-MUNKI_REPO_TARGET=/var/www/munki_repo
+MUNKI_REPO_TARGET=/var/www/html/munki_repo
 MUNKI_HOST_TARGET=munki.EXAMPLE.COM
 MUNKI_REPO_SOURCE=/Users/Shared/munki_repo/
 RSYNC_EXCLUDE="\
@@ -33,7 +33,7 @@ RSYNC_EXCLUDE="\
 #	--exclude=manifests/ \
 #	--exclude=catalogs/ \
 
-RSYNC_OPTIONS="-aHSpv --delete-during  $RSYNC_EXCLUDE $RSYNC_INCLUDE $@"
+RSYNC_OPTIONS="-aHSpv --chown=ADMIN:www-data --delete-during  $RSYNC_EXCLUDE $RSYNC_INCLUDE $@"
 #RSYNC_OPTIONS="-aHSpv --delete-during --bwlimit=64 $RSYNC_EXCLUDE $RSYNC_INCLUDE $@"
 
 if [[ ! -d ~/log ]]; then
