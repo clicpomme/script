@@ -33,7 +33,7 @@ RSYNC_EXCLUDE="\
 #	--exclude=manifests/ \
 #	--exclude=catalogs/ \
 
-RSYNC_OPTIONS="-aHSpv --chown=ADMIN:www-data --delete-during  $RSYNC_EXCLUDE $RSYNC_INCLUDE $@"
+RSYNC_OPTIONS="-aHSpv --delete-during  $RSYNC_EXCLUDE $RSYNC_INCLUDE $@"
 #RSYNC_OPTIONS="-aHSpv --delete-during --bwlimit=64 $RSYNC_EXCLUDE $RSYNC_INCLUDE $@"
 
 if [[ ! -d ~/log ]]; then
