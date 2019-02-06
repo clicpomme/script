@@ -1,0 +1,41 @@
+set username to (do shell script "whoami")
+set drive1 to "NAS"
+set drive2 to "Commun"
+set drive3 to "TimeMachine"
+try
+	-- (0) check server's response
+	set max_retry to 60
+	set k to 0
+	repeat while (do shell script "ping -c 1 192.168.0.200") contains "100% packet loss"
+		delay 5
+		set k to k + 1
+		if k > max_retry then error "Server is not responding for predefined period." number 8000
+	end repeat
+	
+	-- (1) mount server volume
+	tell application "Finder"
+		set mountedDisks to list disks
+		if mountedDisks does not contain drive1 then
+			mount volume "smb://username:password@192.168.0.200/" & drive1 as text
+		end if
+	end tell
+	
+	-- (2) mount server volume
+	tell application "Finder"
+		set mountedDisks to list disks
+		if mountedDisks does not contain drive2 then
+			mount volume "smb://username:password@192.168.0.200/" & drive2 as text
+		end if
+	end tell
+	
+	-- (3) mount server volume
+	tell application "Finder"
+		set mountedDisks to list disks
+		if mountedDisks does not contain drive3 then
+			mount volume "smb://username:password@192.168.0.200/" & drive3 as text
+		end if
+	end tell
+	
+on error
+	tell me to quit
+end try
